@@ -1,0 +1,26 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:planks",
+    "#minecraft:wool",
+    "#minecraft:stone_bricks",
+    "#minecraft:stairs",
+    "#minecraft:slabs",
+    "#minecraft:fences",
+    "#minecraft:walls",
+    "#minecraft:doors",
+    "#minecraft:glass",
+    "minecraft:bricks",
+    "minecraft:brick_slab",
+    "minecraft:brick_stairs",
+    "minecraft:glass_pane",
+    "minecraft:lantern",
+    "minecraft:soul_lantern",
+    "minecraft:torch",
+    "minecraft:soul_torch",
+    "minecraft:glowstone",
+    "minecraft:sea_lantern",
+    "minecraft:farmland",
+    "minecraft:hay_block"
+  ]
+}
