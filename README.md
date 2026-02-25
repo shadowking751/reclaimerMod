@@ -1,2 +1,3 @@
-# reclaimerMod
-Custom Minecraft 1.21.1 Fabric Enderman Mob mod that destroys player-placed blocks and replaces them with natural blocks
+#Reclaimer Mod
+
+The Reclaimer Mod introduces a hostile world‑restoring Enderman variant that actively removes unnatural blocks and reverts terrain back to its natural state. It scans the world for player‑placed structures, dismantles them block‑by‑block, and even corrupts nearby chests by replacing their contents with dirt. The Reclaimer reacts dynamically to player building activity, becoming faster and more aggressive the more you alter the environment. It includes debug commands such as /reclaimer info to view its internal state and /reclaimer purge to force an immediate world scan. This mod is designed to create a tense, evolving survival experience where the world itself pushes back against player expansion.
