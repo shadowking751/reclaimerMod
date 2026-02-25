@@ -13,23 +13,27 @@ group = "com.example.reclaimer"
 repositories {
     mavenCentral()
     maven { url = "https://maven.fabricmc.net/" }
-    maven { url = "https://maven.shedaniel.me/" } // Cloth Config
+    maven { url = "https://maven.shedaniel.me/" } // Cloth Config + AutoConfig
 }
 
 dependencies {
+    // Minecraft + Yarn mappings
     minecraft "com.mojang:minecraft:1.18.2"
     mappings "net.fabricmc:yarn:1.18.2+build.3:v2"
+
+    // Fabric Loader
     modImplementation "net.fabricmc:fabric-loader:0.14.22"
 
     // Fabric API for 1.18.2
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.76.0+1.18.2"
 
-    // Cloth Config + AutoConfig (your code uses this)
+    // Cloth Config (required by AutoConfig)
     modImplementation "me.shedaniel.cloth:cloth-config-fabric:6.2.62"
     include "me.shedaniel.cloth:cloth-config-fabric:6.2.62"
 
-    modImplementation "me.shedaniel.autoconfig:auto-config-base:3.4.0"
-    include "me.shedaniel.autoconfig:auto-config-base:3.4.0"
+    // AutoConfig for 1.18.2
+    modImplementation "me.shedaniel.autoconfig:auto-config-base:3.3.1"
+    include "me.shedaniel.autoconfig:auto-config-base:3.3.1"
 }
 
 loom {
