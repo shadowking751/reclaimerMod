@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "reclaimer",
+  "version": "1.0.0",
+  "name": "Reclaimer Mod",
+  "description": "A hostile world-restoring entity that reclaims player structures.",
+  "authors": ["You"],
+  "license": "MIT",
+
+  "entrypoints": {
+    "main": [
+      "com.example.reclaimer.ReclaimerMod"
+    ],
+    "client": [
+      "com.example.reclaimer.client.ReclaimerModClient"
+    ]
+  },
+
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric": "*",
+    "minecraft": "1.20.x",
+    "java": ">=17"
+  }
+}
