@@ -1,6 +1,7 @@
 package com.example.reclaimer;
 
 import com.example.reclaimer.config.ReclaimerConfig;
+import com.example.reclaimer.entity.ReclaimerEndermanEntity;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -22,7 +23,7 @@ public class ReclaimerMod implements ModInitializer {
         ModEntities.register();
         FabricDefaultAttributeRegistry.register(
                 ModEntities.RECLAIMER_ENDERMAN,
-                com.example.reclaimer.entity.ReclaimerEndermanEntity.createReclaimerAttributes()
+                ReclaimerEndermanEntity.createReclaimerAttributes()
         );
     }
 }
