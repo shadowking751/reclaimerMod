@@ -1,21 +1,26 @@
 package com.example.reclaimer.client;
 
-import com.example.reclaimer.ReclaimerMod;
-import com.example.reclaimer.client.model.ReclaimerModel;
+import com.example.reclaimer.ModEntities;
+import com.example.reclaimer.client.model.ReclaimerEndermanModel;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 
 public class ReclaimerModClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
 
-        // Register your model layer
+        // Model layer for the Reclaimer Enderman
         EntityModelLayerRegistry.registerModelLayer(
-                ReclaimerModel.LAYER_LOCATION,
-                ReclaimerModel::getTexturedModelData
+                ModModelLayers.RECLAIMER_ENDERMAN,
+                ReclaimerEndermanModel::getTexturedModelData
         );
 
-        // Add any other client-side initialization here
+        // Renderer for the Reclaimer Enderman
+        EntityRendererRegistry.register(
+                ModEntities.RECLAIMER_ENDERMAN,
+                ReclaimerEndermanRenderer::new
+        );
     }
 }
