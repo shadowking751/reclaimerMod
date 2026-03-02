@@ -2,27 +2,27 @@ package com.example.reclaimer;
 
 import com.example.reclaimer.entity.ReclaimerEndermanEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Registry;
 
 public class ModEntities {
 
     public static final EntityType<ReclaimerEndermanEntity> RECLAIMER_ENDERMAN =
             Registry.register(
                     Registries.ENTITY_TYPE,
-                    new Identifier(ReclaimerMod.MOD_ID, "reclaimer_enderman"),
+                    new ResourceLocation(ReclaimerMod.MOD_ID, "reclaimer_enderman"),
                     FabricEntityTypeBuilder.createMob()
                             .entityFactory(ReclaimerEndermanEntity::new)
-                            .spawnGroup(SpawnGroup.MONSTER)
-                            .dimensions(EntityDimensions.fixed(0.6f, 2.9f))
+                            .spawnGroup(MobCategory.MONSTER)
+                            .dimensions(EntityDimensions.scalable(0.6f, 2.9f))
                             .build()
             );
 
     public static void register() {
-        // nothing needed here — static init triggers registration
+        // static initializer handles registration
     }
 }
