@@ -29,6 +29,11 @@ dependencies {
 
 loom {
     splitEnvironmentSourceSets()
+
+    // Fix: prevent Loom from attaching Intermediary source jars to Mojang mappings
+    interfaceInjection {
+        enableDependencyInterfaceInjection = false
+    }
 }
 
 java {
