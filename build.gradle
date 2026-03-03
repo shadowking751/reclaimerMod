@@ -28,7 +28,7 @@ dependencies {
 
     modImplementation "net.fabricmc:fabric-loader:0.16.10"
 
-    // Fabric API for 1.21.11
+    // This is the correct Fabric API version — no javadoc, no sources, fully remappable
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.139.5+1.21.11"
 
     modImplementation "me.shedaniel.cloth:cloth-config-fabric:15.0.140"
@@ -45,11 +45,6 @@ loom {
     remapJar {
         addNestedDependencies = false
     }
-}
-
-// Remove the module that contains the invalid javadoc jars
-configurations.all {
-    exclude group: "net.fabricmc.fabric-api", module: "fabric-content-registries-v0"
 }
 
 java {
