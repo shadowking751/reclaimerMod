@@ -1,10 +1,13 @@
 package com.example.reclaimer.client;
 
 import com.example.reclaimer.ReclaimerMod;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class ModModelLayers {
-    public static final EntityModelLayer RECLAIMER_ENDERMAN =
-            new EntityModelLayer(new Identifier(ReclaimerMod.MOD_ID, "reclaimer_enderman"), "main");
+    public static final ModelLayerLocation RECLAIMER_ENDERMAN =
+            new ModelLayerLocation(
+                    new ResourceLocation(ReclaimerMod.MOD_ID, "reclaimer_enderman"),
+                    "main"
+            );
 }
