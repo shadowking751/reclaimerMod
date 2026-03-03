@@ -2,21 +2,21 @@ package com.example.reclaimer.client;
 
 import com.example.reclaimer.ReclaimerMod;
 import com.example.reclaimer.entity.ReclaimerEndermanEntity;
-import net.minecraft.client.render.entity.EndermanEntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.entity.EnderManRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
 
-public class ReclaimerEndermanRenderer extends EndermanEntityRenderer<ReclaimerEndermanEntity> {
+public class ReclaimerEndermanRenderer extends EnderManRenderer<ReclaimerEndermanEntity> {
 
-    private static final Identifier TEXTURE =
-            new Identifier(ReclaimerMod.MOD_ID, "textures/entity/reclaimer_enderman.png");
+    private static final ResourceLocation TEXTURE =
+            new ResourceLocation(ReclaimerMod.MOD_ID, "textures/entity/reclaimer_enderman.png");
 
-    public ReclaimerEndermanRenderer(EntityRendererFactory.Context ctx) {
+    public ReclaimerEndermanRenderer(EntityRendererProvider.Context ctx) {
         super(ctx);
     }
 
     @Override
-    public Identifier getTexture(ReclaimerEndermanEntity entity) {
+    public ResourceLocation getTextureLocation(ReclaimerEndermanEntity entity) {
         return TEXTURE;
     }
 }
