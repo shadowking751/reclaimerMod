@@ -10,7 +10,6 @@ base {
 }
 
 repositories {
-    // Your environment resolves 1.21.11 artifacts from this endpoint.
     maven {
         url = "https://maven.fabricmc.net/"
         metadataSources {
@@ -24,17 +23,14 @@ repositories {
 }
 
 dependencies {
-    // Minecraft 1.21.11 (confirmed available in your environment)
     minecraft "com.mojang:minecraft:1.21.11"
     mappings loom.officialMojangMappings()
 
-    // Fabric Loader (supports future versions)
     modImplementation "net.fabricmc:fabric-loader:0.16.10"
 
-    // Fabric API for 1.21.11 (correct, intermediary, NOT unobfuscated)
+    // Fabric API for 1.21.11
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.139.5+1.21.11"
 
-    // Cloth Config
     modImplementation "me.shedaniel.cloth:cloth-config-fabric:15.0.140"
     include "me.shedaniel.cloth:cloth-config-fabric:15.0.140"
 }
@@ -46,10 +42,14 @@ loom {
         enableDependencyInterfaceInjection = false
     }
 
-    // Prevent Loom from trying to remap nested jars
     remapJar {
         addNestedDependencies = false
     }
+}
+
+// Remove the module that contains the invalid javadoc jars
+configurations.all {
+    exclude group: "net.fabricmc.fabric-api", module: "fabric-content-registries-v0"
 }
 
 java {
