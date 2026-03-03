@@ -1,17 +1,17 @@
 package com.example.reclaimer.client.model;
 
 import com.example.reclaimer.entity.ReclaimerEndermanEntity;
-import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.model.TexturedModelData;
-import net.minecraft.client.render.entity.model.EndermanEntityModel;
+import net.minecraft.client.model.EnderManModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
 
-public class ReclaimerEndermanModel extends EndermanEntityModel<ReclaimerEndermanEntity> {
+public class ReclaimerEndermanModel extends EnderManModel<ReclaimerEndermanEntity> {
 
     public ReclaimerEndermanModel(ModelPart root) {
         super(root);
     }
 
-    public static TexturedModelData getTexturedModelData() {
-        return EndermanEntityModel.getTexturedModelData();
+    public static LayerDefinition createBodyLayer() {
+        return EnderManModel.createBodyLayer();
     }
 }
