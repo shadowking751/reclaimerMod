@@ -46,15 +46,16 @@ loom {
         enableDependencyInterfaceInjection = false
     }
 
-    // Prevent Loom from trying to remap nested jars (helps with unobfuscated builds)
+    // Prevent Loom from trying to remap nested jars
     remapJar {
         addNestedDependencies = false
     }
 }
 
-// Correct fix: exclude Fabric API javadoc jars
+// Correct fix: exclude Fabric API javadoc and sources jars
 configurations.all {
-    exclude group: "net.fabricmc.fabric-api", classifier: "javadoc"
+    exclude group: "net.fabricmc.fabric-api", module: "fabric-api", classifier: "javadoc"
+    exclude group: "net.fabricmc.fabric-api", module: "fabric-api", classifier: "sources"
 }
 
 java {
