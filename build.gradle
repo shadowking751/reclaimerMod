@@ -11,7 +11,6 @@ base {
 
 repositories {
     // Your environment resolves 1.21.11 artifacts from this endpoint.
-    // Keeping it FIRST ensures Gradle uses the same backend your browser does.
     maven {
         url = "https://maven.fabricmc.net/"
         metadataSources {
@@ -47,13 +46,15 @@ loom {
         enableDependencyInterfaceInjection = false
     }
 
-    // Prevent Loom from trying to remap javadoc jars
+    // Prevent Loom from trying to remap nested jars (helps with unobfuscated builds)
     remapJar {
         addNestedDependencies = false
     }
+}
 
-    // Disable remapped variants (fixes unobfuscated javadoc namespace crash)
-    disableRemappedVariants = true
+// Correct fix: exclude Fabric API javadoc jars
+configurations.all {
+    exclude group: "net.fabricmc.fabric-api", classifier: "javadoc"
 }
 
 java {
