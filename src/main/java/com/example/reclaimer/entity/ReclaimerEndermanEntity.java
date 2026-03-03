@@ -1,40 +1,40 @@
 package com.example.reclaimer.entity;
 
 import com.example.reclaimer.ReclaimerMod;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.EndermanEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.world.ServerWorldAccess;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.util.RandomSource;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.Random;
 
-public class ReclaimerEndermanEntity extends EndermanEntity {
+public class ReclaimerEndermanEntity extends EnderMan {
 
     private final Queue<BlockPos> cleanupQueue = new ArrayDeque<>();
     private int scanCooldown = 0;
@@ -44,48 +44,51 @@ public class ReclaimerEndermanEntity extends EndermanEntity {
     private int reactivityCooldown = 0;
 
     private static final TagKey<Block> UNNATURAL_BLOCKS =
-            BlockTags.create(new Identifier("reclaimer", "unnatural_blocks"));
+            BlockTags.create(new ResourceLocation("reclaimer", "unnatural_blocks"));
     private static final TagKey<Block> NATURAL_BLOCKS =
-            BlockTags.create(new Identifier("reclaimer", "natural_blocks"));
+            BlockTags.create(new ResourceLocation("reclaimer", "natural_blocks"));
     private static final TagKey<Block> PLAYER_STRUCTURES =
-            BlockTags.create(new Identifier("reclaimer", "player_structures"));
+            BlockTags.create(new ResourceLocation("reclaimer", "player_structures"));
     private static final TagKey<Block> STRUCTURE_PROTECTED =
-            BlockTags.create(new Identifier("reclaimer", "structure_protected"));
+            BlockTags.create(new ResourceLocation("reclaimer", "structure_protected"));
 
-    public ReclaimerEndermanEntity(EntityType<? extends EndermanEntity> type, World world) {
+    public ReclaimerEndermanEntity(EntityType<? extends EnderMan> type, Level world) {
         super(type, world);
     }
 
-    public static DefaultAttributeContainer.Builder createReclaimerAttributes() {
-        return EndermanEntity.createEndermanAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 40.0)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3);
+    public static AttributeSupplier.Builder createReclaimerAttributes() {
+        return EnderMan.createAttributes()
+                .add(Attributes.MAX_HEALTH, 40.0)
+                .add(Attributes.MOVEMENT_SPEED, 0.3);
     }
 
-    public static boolean canSpawn(EntityType<ReclaimerEndermanEntity> type, ServerWorldAccess world,
-                                   SpawnReason reason, BlockPos pos, Random random) {
-        return world.getLightLevel(pos) <= 7 &&
-                world.getBlockState(pos.down()).isOpaque();
-    }
-
-    @Override
-    protected void initGoals() {
-        this.goalSelector.clear();
-        this.targetSelector.clear();
-        this.goalSelector.add(0, new RestoreWorldGoal(this));
+    public static boolean canSpawn(EntityType<ReclaimerEndermanEntity> type,
+                                   ServerLevelAccessor world,
+                                   MobSpawnType reason,
+                                   BlockPos pos,
+                                   RandomSource random) {
+        return world.getBrightness(LightLayer.BLOCK, pos) <= 7 &&
+                world.getBlockState(pos.below()).isSolid();
     }
 
     @Override
-    public boolean isPlayerStaring(PlayerEntity player) {
+    protected void registerGoals() {
+        this.goalSelector.removeAllGoals();
+        this.targetSelector.removeAllGoals();
+        this.goalSelector.addGoal(0, new RestoreWorldGoal(this));
+    }
+
+    @Override
+    public boolean isLookingAtMe(Player player) {
         return false;
     }
 
     @Override
-    public boolean damage(DamageSource source, float amount) {
-        boolean result = super.damage(source, amount);
-        if (!this.getWorld().isClient && result) {
+    public boolean hurt(DamageSource source, float amount) {
+        boolean result = super.hurt(source, amount);
+        if (!this.level().isClientSide && result) {
             for (int i = 0; i < 8; i++) {
-                if (this.teleportRandomly()) break;
+                if (this.teleport()) break;
             }
         }
         return result;
@@ -117,18 +120,18 @@ public class ReclaimerEndermanEntity extends EndermanEntity {
         }
 
         @Override
-        public boolean canStart() {
+        public boolean canUse() {
             return true;
         }
 
         @Override
         public void tick() {
-            if (!(mob.getWorld() instanceof ServerWorld world)) return;
+            if (!(mob.level() instanceof ServerLevel world)) return;
 
-            BlockPos below = mob.getBlockPos().down();
+            BlockPos below = mob.blockPosition().below();
             BlockState belowState = world.getBlockState(below);
-            if (belowState.isOf(Blocks.WATER) || belowState.isOf(Blocks.LAVA)) {
-                mob.teleportRandomly();
+            if (belowState.is(Blocks.WATER) || belowState.is(Blocks.LAVA)) {
+                mob.teleport();
                 return;
             }
 
@@ -149,19 +152,19 @@ public class ReclaimerEndermanEntity extends EndermanEntity {
                 }
             }
 
-            if (mob.age % 40 == 0) {
+            if (mob.tickCount % 40 == 0) {
                 moveTowardCorruption(world);
             }
         }
 
-        private void enqueueScan(ServerWorld world) {
+        private void enqueueScan(ServerLevel world) {
             int radius = ReclaimerMod.CONFIG.scanRadius;
 
             double rad = Math.toRadians(angle);
             angle = (angle + 30) % 360;
 
-            BlockPos center = mob.getBlockPos();
-            BlockPos target = center.add(
+            BlockPos center = mob.blockPosition();
+            BlockPos target = center.offset(
                     (int) (Math.cos(rad) * radius),
                     0,
                     (int) (Math.sin(rad) * radius)
@@ -169,18 +172,18 @@ public class ReclaimerEndermanEntity extends EndermanEntity {
 
             for (int dx = -2; dx <= 2; dx++) {
                 for (int dz = -2; dz <= 2; dz++) {
-                    BlockPos pos = target.add(dx, 0, dz);
-                    if (!world.isChunkLoaded(pos)) continue;
+                    BlockPos pos = target.offset(dx, 0, dz);
+                    if (!world.hasChunkAt(pos)) continue;
 
                     BlockState state = world.getBlockState(pos);
                     if (isUnnatural(state.getBlock())) {
-                        cleanupQueue.add(pos.toImmutable());
+                        cleanupQueue.add(pos.immutable());
                     }
                 }
             }
         }
 
-        private void processCleanup(ServerWorld world) {
+        private void processCleanup(ServerLevel world) {
             int limit = ReclaimerMod.CONFIG.maxBlocksPerTick;
 
             for (int i = 0; i < limit && !cleanupQueue.isEmpty(); i++) {
@@ -188,27 +191,27 @@ public class ReclaimerEndermanEntity extends EndermanEntity {
                 BlockState state = world.getBlockState(pos);
 
                 if (isUnnatural(state.getBlock())) {
-                    world.spawnParticles(ParticleTypes.ASH,
+                    world.sendParticles(ParticleTypes.ASH,
                             pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                             6, 0.2, 0.2, 0.2, 0.01);
 
-                    world.playSound(null, pos, SoundEvents.BLOCK_GRASS_PLACE,
-                            SoundCategory.BLOCKS, 0.4f, 0.8f + world.random.nextFloat() * 0.4f);
+                    world.playSound(null, pos, SoundEvents.GRASS_PLACE,
+                            SoundSource.BLOCKS, 0.4f, 0.8f + world.random.nextFloat() * 0.4f);
 
-                    world.setBlockState(pos, getNaturalReplacement(world, pos));
+                    world.setBlock(pos, getNaturalReplacement(world, pos), 3);
                 }
             }
 
-            if (mob.age % 200 == 0 && !cleanupQueue.isEmpty()) {
-                BlockPos center = mob.getBlockPos();
-                world.playSound(null, center, SoundEvents.BLOCK_AMETHYST_BLOCK_RESONATE,
-                        SoundCategory.AMBIENT, 0.8f, 0.6f);
+            if (mob.tickCount % 200 == 0 && !cleanupQueue.isEmpty()) {
+                BlockPos center = mob.blockPosition();
+                world.playSound(null, center, SoundEvents.AMETHYST_BLOCK_RESONATE,
+                        SoundSource.AMBIENT, 0.8f, 0.6f);
             }
         }
 
-        private void moveTowardCorruption(ServerWorld world) {
+        private void moveTowardCorruption(ServerLevel world) {
             int radius = ReclaimerMod.CONFIG.scanRadius * 2;
-            BlockPos origin = mob.getBlockPos();
+            BlockPos origin = mob.blockPosition();
 
             BlockPos bestPos = null;
             int bestScore = 0;
@@ -216,9 +219,9 @@ public class ReclaimerEndermanEntity extends EndermanEntity {
             for (int i = 0; i < 16; i++) {
                 int dx = world.random.nextInt(radius * 2 + 1) - radius;
                 int dz = world.random.nextInt(radius * 2 + 1) - radius;
-                BlockPos pos = origin.add(dx, 0, dz);
+                BlockPos pos = origin.offset(dx, 0, dz);
 
-                if (!world.isChunkLoaded(pos)) continue;
+                if (!world.hasChunkAt(pos)) continue;
 
                 int score = countUnnaturalAround(world, pos, 3);
                 if (score > bestScore) {
@@ -228,7 +231,7 @@ public class ReclaimerEndermanEntity extends EndermanEntity {
             }
 
             if (bestPos != null && bestScore > 0) {
-                mob.getNavigation().startMovingTo(
+                mob.getNavigation().moveTo(
                         bestPos.getX() + 0.5,
                         bestPos.getY(),
                         bestPos.getZ() + 0.5,
@@ -237,9 +240,9 @@ public class ReclaimerEndermanEntity extends EndermanEntity {
             }
         }
 
-        private int countUnnaturalAround(ServerWorld world, BlockPos center, int r) {
+        private int countUnnaturalAround(ServerLevel world, BlockPos center, int r) {
             int count = 0;
-            BlockPos.Mutable pos = new BlockPos.Mutable();
+            BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
             for (int dx = -r; dx <= r; dx++) {
                 for (int dz = -r; dz <= r; dz++) {
@@ -252,53 +255,53 @@ public class ReclaimerEndermanEntity extends EndermanEntity {
         }
 
         private boolean isUnnatural(Block block) {
-            return block.getDefaultState().isIn(UNNATURAL_BLOCKS);
+            return block.defaultBlockState().is(UNNATURAL_BLOCKS);
         }
 
-        private BlockState getNaturalReplacement(ServerWorld world, BlockPos pos) {
-            BlockState below = world.getBlockState(pos.down());
+        private BlockState getNaturalReplacement(ServerLevel world, BlockPos pos) {
+            BlockState below = world.getBlockState(pos.below());
 
-            if (below.getBlock().getDefaultState().isIn(NATURAL_BLOCKS)) {
-                return below.getBlock().getDefaultState();
+            if (below.getBlock().defaultBlockState().is(NATURAL_BLOCKS)) {
+                return below.getBlock().defaultBlockState();
             }
 
-            return Blocks.DIRT.getDefaultState();
+            return Blocks.DIRT.defaultBlockState();
         }
 
         // -----------------------------
         // CATASTROPHIC STRUCTURAL REJECTION
         // -----------------------------
-        private void applyStructuralRejection(ServerWorld world) {
+        private void applyStructuralRejection(ServerLevel world) {
             int radius = ReclaimerMod.CONFIG.structureRadius;
             int maxChanges = ReclaimerMod.CONFIG.maxStructureChangesPerTick;
 
-            BlockPos origin = mob.getBlockPos();
+            BlockPos origin = mob.blockPosition();
             int changes = 0;
 
-            BlockPos.Mutable pos = new BlockPos.Mutable();
+            BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
             for (int dx = -radius; dx <= radius && changes < maxChanges; dx++) {
                 for (int dy = -2; dy <= 4 && changes < maxChanges; dy++) {
                     for (int dz = -radius; dz <= radius && changes < maxChanges; dz++) {
                         pos.set(origin.getX() + dx, origin.getY() + dy, origin.getZ() + dz);
-                        if (!world.isChunkLoaded(pos)) continue;
+                        if (!world.hasChunkAt(pos)) continue;
 
                         BlockState state = world.getBlockState(pos);
                         Block block = state.getBlock();
 
                         if (!state.isAir() &&
-                                block.getDefaultState().isIn(PLAYER_STRUCTURES) &&
-                                !block.getDefaultState().isIn(STRUCTURE_PROTECTED)) {
+                                block.defaultBlockState().is(PLAYER_STRUCTURES) &&
+                                !block.defaultBlockState().is(STRUCTURE_PROTECTED)) {
 
                             BlockState replacement = pickStructureReplacement(world, pos, state);
-                            world.setBlockState(pos, replacement, 3);
+                            world.setBlock(pos, replacement, 3);
 
-                            world.spawnParticles(ParticleTypes.ASH,
+                            world.sendParticles(ParticleTypes.ASH,
                                     pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                                     8, 0.3, 0.3, 0.3, 0.02);
 
-                            world.playSound(null, pos, SoundEvents.BLOCK_ROOTED_DIRT_PLACE,
-                                    SoundCategory.BLOCKS, 0.6f, 0.6f + world.random.nextFloat() * 0.4f);
+                            world.playSound(null, pos, SoundEvents.ROOTED_DIRT_PLACE,
+                                    SoundSource.BLOCKS, 0.6f, 0.6f + world.random.nextFloat() * 0.4f);
 
                             changes++;
                         }
@@ -307,53 +310,53 @@ public class ReclaimerEndermanEntity extends EndermanEntity {
             }
         }
 
-        private BlockState pickStructureReplacement(ServerWorld world, BlockPos pos, BlockState original) {
-            Block below = world.getBlockState(pos.down()).getBlock();
+        private BlockState pickStructureReplacement(ServerLevel world, BlockPos pos, BlockState original) {
+            Block below = world.getBlockState(pos.below()).getBlock();
 
             if (below == Blocks.GRASS_BLOCK || below == Blocks.DIRT || below == Blocks.COARSE_DIRT) {
                 switch (world.random.nextInt(4)) {
-                    case 0: return Blocks.GRASS_BLOCK.getDefaultState();
-                    case 1: return Blocks.DIRT.getDefaultState();
-                    case 2: return Blocks.COARSE_DIRT.getDefaultState();
-                    default: return Blocks.MOSS_BLOCK.getDefaultState();
+                    case 0: return Blocks.GRASS_BLOCK.defaultBlockState();
+                    case 1: return Blocks.DIRT.defaultBlockState();
+                    case 2: return Blocks.COARSE_DIRT.defaultBlockState();
+                    default: return Blocks.MOSS_BLOCK.defaultBlockState();
                 }
             }
 
             if (below == Blocks.STONE || below == Blocks.COBBLESTONE || below == Blocks.ANDESITE) {
                 switch (world.random.nextInt(3)) {
-                    case 0: return Blocks.MOSSY_COBBLESTONE.getDefaultState();
-                    case 1: return Blocks.STONE.getDefaultState();
-                    default: return Blocks.DIRT.getDefaultState();
+                    case 0: return Blocks.MOSSY_COBBLESTONE.defaultBlockState();
+                    case 1: return Blocks.STONE.defaultBlockState();
+                    default: return Blocks.DIRT.defaultBlockState();
                 }
             }
 
-            if (original.isOf(Blocks.GLASS) || original.isOf(Blocks.GLASS_PANE)) {
-                return Blocks.AIR.getDefaultState();
+            if (original.is(Blocks.GLASS) || original.is(Blocks.GLASS_PANE)) {
+                return Blocks.AIR.defaultBlockState();
             }
 
-            if (original.isOf(Blocks.TORCH) || original.isOf(Blocks.LANTERN) || original.isOf(Blocks.SOUL_LANTERN)) {
-                return Blocks.AIR.getDefaultState();
+            if (original.is(Blocks.TORCH) || original.is(Blocks.LANTERN) || original.is(Blocks.SOUL_LANTERN)) {
+                return Blocks.AIR.defaultBlockState();
             }
 
-            if (original.isOf(Blocks.FARMLAND)) {
-                return Blocks.DIRT.getDefaultState();
+            if (original.is(Blocks.FARMLAND)) {
+                return Blocks.DIRT.defaultBlockState();
             }
 
-            return Blocks.DIRT.getDefaultState();
+            return Blocks.DIRT.defaultBlockState();
         }
 
         // -----------------------------
         // CHEST CORRUPTION (CATACLYSMIC)
         // -----------------------------
-        private void corruptChests(ServerWorld world) {
+        private void corruptChests(ServerLevel world) {
             int radius = ReclaimerMod.CONFIG.chestRadius;
-            BlockPos origin = mob.getBlockPos();
+            BlockPos origin = mob.blockPosition();
 
-            for (BlockPos pos : BlockPos.iterate(
-                    origin.add(-radius, -1, -radius),
-                    origin.add(radius, 2, radius))) {
+            for (BlockPos pos : BlockPos.betweenClosed(
+                    origin.offset(-radius, -1, -radius),
+                    origin.offset(radius, 2, radius))) {
 
-                if (!world.isChunkLoaded(pos)) continue;
+                if (!world.hasChunkAt(pos)) continue;
 
                 BlockEntity be = world.getBlockEntity(pos);
                 if (be instanceof ChestBlockEntity chest) {
@@ -362,21 +365,21 @@ public class ReclaimerEndermanEntity extends EndermanEntity {
             }
         }
 
-        private void corruptChestInventory(Inventory inv) {
-            int size = inv.size();
+        private void corruptChestInventory(Container inv) {
+            int size = inv.getContainerSize();
 
             for (int i = 0; i < size; i++) {
-                ItemStack stack = inv.getStack(i);
+                ItemStack stack = inv.getItem(i);
 
                 if (stack.isEmpty()) {
-                    inv.setStack(i, new ItemStack(Items.DIRT, 64));
+                    inv.setItem(i, new ItemStack(Items.DIRT, 64));
                     continue;
                 }
 
                 if (stack.getItem() instanceof BlockItem blockItem) {
                     Block block = blockItem.getBlock();
-                    if (block.getDefaultState().isIn(UNNATURAL_BLOCKS)) {
-                        inv.setStack(i, new ItemStack(Items.DIRT, 64));
+                    if (block.defaultBlockState().is(UNNATURAL_BLOCKS)) {
+                        inv.setItem(i, new ItemStack(Items.DIRT, 64));
                     }
                 }
             }
@@ -398,7 +401,7 @@ public class ReclaimerEndermanEntity extends EndermanEntity {
         return angle;
     }
 
-    public void forceScan(ServerWorld world) {
+    public void forceScan(ServerLevel world) {
         cleanupQueue.clear();
         scanCooldown = 0;
     }
