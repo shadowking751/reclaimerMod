@@ -14,13 +14,11 @@ public class ReclaimerModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 
-        // Register model layer
         EntityModelLayerRegistry.registerModelLayer(
                 RECLAIMER_ENDERMAN_LAYER,
                 ReclaimerEndermanModel::getTexturedModelData
         );
 
-        // Register renderer
         EntityRendererRegistry.register(
                 ReclaimerMod.RECLAIMER_ENDERMAN_ENTITY,
                 ReclaimerEndermanRenderer::new
