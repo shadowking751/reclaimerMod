@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.6.+' // 1.6+ is recommended for 1.21.x
+    id 'fabric-loom' version '1.7.413'
 }
 
 group = "com.example.reclaimer"
