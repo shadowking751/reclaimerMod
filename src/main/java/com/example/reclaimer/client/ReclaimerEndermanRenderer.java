@@ -1,22 +1,22 @@
 package com.example.reclaimer.client;
 
-import com.example.reclaimer.ReclaimerMod;
-import com.example.reclaimer.entity.ReclaimerEndermanEntity;
-import net.minecraft.client.renderer.entity.EnderManRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.MobEntityRenderer;
+import net.minecraft.client.render.entity.model.EndermanEntityModel;
+import net.minecraft.util.Identifier;
 
-public class ReclaimerEndermanRenderer extends EnderManRenderer<ReclaimerEndermanEntity> {
+public class ReclaimerEndermanRenderer
+        extends MobEntityRenderer<ReclaimerEndermanEntity, EndermanEntityModel<ReclaimerEndermanEntity>> {
 
-    private static final ResourceLocation TEXTURE =
-            new ResourceLocation(ReclaimerMod.MOD_ID, "textures/entity/reclaimer_enderman.png");
+    private static final Identifier TEXTURE =
+            new Identifier("reclaimer", "textures/entity/reclaimer_enderman.png");
 
-    public ReclaimerEndermanRenderer(EntityRendererProvider.Context ctx) {
-        super(ctx);
+    public ReclaimerEndermanRenderer(EntityRendererFactory.Context ctx) {
+        super(ctx, new EndermanEntityModel<>(ctx.getPart(ReclaimerModClient.RECLAIMER_ENDERMAN_LAYER)), 0.5f);
     }
 
     @Override
-    public ResourceLocation getTextureLocation(ReclaimerEndermanEntity entity) {
+    public Identifier getTexture(ReclaimerEndermanEntity entity) {
         return TEXTURE;
     }
 }
