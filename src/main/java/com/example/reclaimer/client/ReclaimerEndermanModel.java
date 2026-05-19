@@ -2,7 +2,6 @@ package com.example.reclaimer.client;
 
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.model.EndermanEntityModel;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.render.entity.model.TexturedModelData;
 
 public class ReclaimerEndermanModel extends EndermanEntityModel<ReclaimerEndermanEntity> {
