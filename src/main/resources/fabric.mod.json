@@ -1,25 +1,39 @@
 {
   "schemaVersion": 1,
   "id": "reclaimer",
-  "version": "1.0.0",
-  "name": "Reclaimer Mod",
-  "description": "A hostile world-restoring entity that reclaims player structures.",
-  "authors": ["You"],
+  "version": "1.21.1",
+
+  "name": "Reclaimer",
+  "description": "A Fabric mod for Minecraft 1.21.1.",
+  "authors": [
+    "YourNameHere"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+
   "license": "MIT",
+
+  "environment": "*",
 
   "entrypoints": {
     "main": [
       "com.example.reclaimer.ReclaimerMod"
     ],
     "client": [
-      "com.example.reclaimer.client.ReclaimerModClient"
+      "com.example.reclaimer.ReclaimerModClient"
     ]
   },
 
   "depends": {
-    "fabricloader": ">=0.16.10",
-    "fabric": "*",
-    "minecraft": "1.21.11",
+    "minecraft": "1.21.1",
+    "fabricloader": ">=0.16.0",
+    "fabric-api": ">=0.116.0",
     "java": ">=21"
-  }
+  },
+
+  "mixins": [
+    "reclaimer.mixins.json"
+  ]
 }
