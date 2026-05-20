@@ -1,27 +1,24 @@
-package com.example.reclaimer.client;
+package com.example.reclaimer;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
-import net.minecraft.util.Identifier;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+
+import com.example.reclaimer.client.ModModelLayers;
+import com.example.reclaimer.client.ReclaimerEndermanModel;
+import com.example.reclaimer.client.ReclaimerEndermanRenderer;
 
 public class ReclaimerModClient implements ClientModInitializer {
-
-    public static final EntityModelLayer RECLAIMER_ENDERMAN_LAYER =
-            new EntityModelLayer(new Identifier("reclaimer", "enderman"), "main");
-
     @Override
     public void onInitializeClient() {
-
-        EntityModelLayerRegistry.registerModelLayer(
-                RECLAIMER_ENDERMAN_LAYER,
-                ReclaimerEndermanModel::getTexturedModelData
+        EntityRendererRegistry.register(
+                ModEntities.RECLAIMER_ENDERMAN,
+                ReclaimerEndermanRenderer::new
         );
 
-        EntityRendererRegistry.register(
-                ReclaimerMod.RECLAIMER_ENDERMAN_ENTITY,
-                ReclaimerEndermanRenderer::new
+        EntityModelLayerRegistry.registerModelLayer(
+                ModModelLayers.RECLAIMER_ENDERMAN_LAYER,
+                ReclaimerEndermanModel::getTexturedModelData
         );
     }
 }
