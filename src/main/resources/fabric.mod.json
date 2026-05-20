@@ -2,23 +2,19 @@
   "schemaVersion": 1,
   "id": "reclaimer",
   "version": "1.0.0",
-
   "name": "Reclaimer Mod",
-  "description": "A Fabric mod.",
-  "authors": ["juder"],
+  "description": "Custom Enderman-like entity on Fabric.",
+  "authors": ["you"],
   "license": "MIT",
-
   "environment": "*",
-
   "entrypoints": {
     "main": [
-      "com.juder.reclaimer.ReclaimerMod"
+      "com.example.reclaimer.ReclaimerMod"
     ],
     "client": [
-      "com.juder.reclaimer.ReclaimerModClient"
+      "com.example.reclaimer.ReclaimerModClient"
     ]
   },
-
   "depends": {
     "fabricloader": ">=0.16.5",
     "fabric": "*",
