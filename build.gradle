@@ -6,14 +6,27 @@ group = 'com.example'
 version = '1.0.0'
 
 repositories {
+    // Required for Fabric Loom + mappings + Fabric API
+    maven { url = "https://maven.fabricmc.net/" }
+
+    // Required for Mojang libraries (authlib, brigadier, DFU, etc.)
+    maven { url = "https://libraries.minecraft.net/" }
+
+    // General dependencies
     mavenCentral()
-    maven { url = 'https://maven.fabricmc.net/' }
 }
 
 dependencies {
+    // Minecraft version
     minecraft "com.mojang:minecraft:1.21.1"
+
+    // Yarn mappings
     mappings "net.fabricmc:yarn:1.21.1+build.1:v2"
+
+    // Fabric loader
     modImplementation "net.fabricmc:fabric-loader:0.16.5"
+
+    // Fabric API
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.102.0+1.21.1"
 }
 
