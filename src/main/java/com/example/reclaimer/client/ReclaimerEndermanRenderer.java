@@ -2,17 +2,21 @@ package com.example.reclaimer.client;
 
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.MobEntityRenderer;
-import net.minecraft.client.render.entity.model.EndermanEntityModel;
 import net.minecraft.util.Identifier;
 
+import com.example.reclaimer.ReclaimerMod;
+import com.example.reclaimer.entity.ReclaimerEndermanEntity;
+
 public class ReclaimerEndermanRenderer
-        extends MobEntityRenderer<ReclaimerEndermanEntity, EndermanEntityModel<ReclaimerEndermanEntity>> {
+        extends MobEntityRenderer<ReclaimerEndermanEntity, ReclaimerEndermanModel> {
 
     private static final Identifier TEXTURE =
-            new Identifier("reclaimer", "textures/entity/reclaimer_enderman.png");
+            new Identifier(ReclaimerMod.MOD_ID, "textures/entity/reclaimer_enderman.png");
 
     public ReclaimerEndermanRenderer(EntityRendererFactory.Context ctx) {
-        super(ctx, new EndermanEntityModel<>(ctx.getPart(ReclaimerModClient.RECLAIMER_ENDERMAN_LAYER)), 0.5f);
+        super(ctx, new ReclaimerEndermanModel(
+                ctx.getPart(ModModelLayers.RECLAIMER_ENDERMAN_LAYER)
+        ), 0.5F);
     }
 
     @Override
